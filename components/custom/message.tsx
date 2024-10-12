@@ -8,6 +8,7 @@ import { BotIcon, UserIcon } from "./icons";
 import { Markdown } from "./markdown";
 import { PreviewAttachment } from "./preview-attachment";
 import { Weather } from "./weather";
+import { WebpageMarkdownViewer } from "./WebpageMarkdownViewer";
 
 export const Message = ({
   role,
@@ -49,13 +50,16 @@ export const Message = ({
                   <div key={toolCallId}>
                     {toolName === "getWeather" ? (
                       <Weather weatherAtLocation={result} />
+                    ) : toolName === "getWebpageMarkdown" ? (
+                      <WebpageMarkdownViewer data={result} />
                     ) : null}
                   </div>
                 );
               } else {
                 return (
                   <div key={toolCallId} className="skeleton">
-                    {toolName === "getWeather" ? <Weather /> : null}
+                    {toolName === "getWeather" ? <Weather /> : 
+                     toolName === "getWebpageMarkdown" ? <WebpageMarkdownViewer /> : null}
                   </div>
                 );
               }

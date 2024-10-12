@@ -18,17 +18,24 @@ import { PreviewAttachment } from "./preview-attachment";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 
+const truncateContent = (content: string, maxLength: number = 30): string => {
+  if (content.length <= maxLength) {
+    return content;
+  }
+  return `${content.slice(0, maxLength - 3)}...`;
+};
+
 const suggestedActions = [
   {
-    title: "What is the weather",
-    label: "in San Francisco?",
-    action: "what is the weather in San Francisco?",
+    title: "天气怎么样？",
+    label: "北京",
+    action: "北京天气怎么样？",
   },
   {
-    title: "Answer like I'm 5,",
-    label: "why is the sky blue?",
-    action: "Answer like I'm 5, why is the sky blue?",
-  },
+    title: "文章摘要",
+    label: "https://xiaowangye.org/posts/how-to-build-google-custom-search-engine-step-by-step",
+    action: "Using the webpage https://xiaowangye.org/posts/how-to-build-google-custom-search-engine-step-by-step provided by the user, write a summary in the same language, highlighting the key points. Include a hook to attract clicks, starting with a question to engage the user.",
+  }, 
 ];
 
 export function MultimodalInput({
@@ -170,8 +177,8 @@ export function MultimodalInput({
                   className="w-full text-left border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-300 rounded-lg p-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex flex-col"
                 >
                   <span className="font-medium">{suggestedAction.title}</span>
-                  <span className="text-zinc-500 dark:text-zinc-400">
-                    {suggestedAction.label}
+                  <span className="text-zinc-500 dark:text-zinc-400 truncate" title={suggestedAction.label}>
+                    {truncateContent(suggestedAction.label)}
                   </span>
                 </button>
               </motion.div>

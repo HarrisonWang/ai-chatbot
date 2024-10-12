@@ -39,6 +39,17 @@ export async function POST(request: Request) {
           return weatherData;
         },
       },
+      getWebpageMarkdown: {
+        description: "Get the markdown content of a webpage",
+        parameters: z.object({
+          url: z.string().url(),
+        }),
+        execute: async ({ url }) => {
+          const response = await fetch(`http://r.jina.ai/${url}`);
+          const markdown = await response.text();
+          return markdown;
+        },
+      },
     },
     onFinish: async ({ responseMessages }) => {
       if (session.user && session.user.id) {
