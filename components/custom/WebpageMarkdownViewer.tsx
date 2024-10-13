@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
 import cx from "classnames";
 import { ChevronDown } from 'lucide-react';
+import { useState, useRef, useEffect } from "react";
 
 import { Markdown } from "./markdown";
 
