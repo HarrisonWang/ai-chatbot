@@ -1,24 +1,43 @@
 import { z } from "zod";
 
+const MAX_RETRIES = 3;
+
+async function fetchWithRetry(url: string, retries = 0): Promise<any> {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    if (retries < MAX_RETRIES) {
+      console.warn(`Retry attempt ${retries + 1} for ${url}`);
+      return fetchWithRetry(url, retries + 1);
+    }
+    throw error;
+  }
+}
+
 export const searchGoogle = {
   description: "Search Google",
   parameters: z.object({
     query: z.string(),
   }),
   execute: async ({ query }: { query: string }) => {
-    // const key = "AIzaSyAVPRCrKWQA3Rp0jypB2gnkH_Erc53Sd90";
-    // const searchEngineId = "54e81490052da4f21";
-    // const searchEngineName = "voy";
+    const googleKey = process.env.GOOGLE_API_KEY;
+    const searchEngineId = process.env.GOOGLE_SEARCH_ENGINE_ID;
+    const serpApiKey = process.env.SERPAPI_KEY;
 
-    // const response = await fetch(
-    //   `https://www.googleapis.com/customsearch/v1?key=${key}&cx=${searchEngineId}:${searchEngineName}&q=${query}`,
-    // );
+    const googleUrl = `https://www.googleapis.com/customsearch/v1?key=${googleKey}&cx=${searchEngineId}&q=${encodeURIComponent(query)}`;
+    const serpApiUrl = `https://serpapi.com/search?api_key=${serpApiKey}&q=${encodeURIComponent(query)}`;
 
-    const apiKey = "cc4602bfb6cbf5c507f020c7cbb703398818d55424b1f4c7e551383c86a8dfb8";
-    const response = await fetch(
-      `https://serpapi.com/search?api_key=${apiKey}&q=${query}`,
-    );
-    const searchData = await response.json();
-    return searchData;
+    try {
+      return await fetchWithRetry(googleUrl);
+    } catch (googleError) {
+      console.error("Google API 调用失败，尝试使用 SerpAPI");
+      try {
+        return await fetchWithRetry(serpApiUrl);
+      } catch (serpApiError) {
+        throw new Error("两个搜索 API 都失败了");
+      }
+    }
   },
 };
