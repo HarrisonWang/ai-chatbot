@@ -49,12 +49,18 @@ export interface RegisterActionState {
     | "failed"
     | "user_exists"
     | "invalid_data";
+  message?: string;
 }
 
 export const register = async (
   _: RegisterActionState,
   formData: FormData,
 ): Promise<RegisterActionState> => {
+  // 检查注册功能是否启用
+  if (process.env.NEXT_PUBLIC_ENABLE_REGISTRATION === 'false') {
+    return { status: "failed", message: "注册功能已关闭！" };
+  }
+
   try {
     const validatedData = authFormSchema.parse({
       email: formData.get("email"),
