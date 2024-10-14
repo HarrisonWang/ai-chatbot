@@ -7,6 +7,7 @@ import { ReactNode } from "react";
 import { BotIcon, UserIcon } from "./icons";
 import { Markdown } from "./markdown";
 import { PreviewAttachment } from "./preview-attachment";
+import { SearchGoogleResults } from "./SearchGoogleResults";
 import { Weather } from "./weather";
 import { WebpageMarkdownViewer } from "./WebpageMarkdownViewer";
 
@@ -52,6 +53,15 @@ export const Message = ({
                       <Weather weatherAtLocation={result} />
                     ) : toolName === "getWebpageMarkdown" ? (
                       <WebpageMarkdownViewer data={result} />
+                    ) : toolName === "search" ? (
+                      <SearchGoogleResults 
+                        query={result.query} 
+                        results={result.organic_results?.map((item: any) => ({
+                          title: item.title,
+                          url: item.link,
+                          snippet: item.snippet
+                        })) || []}
+                      />
                     ) : null}
                   </div>
                 );
@@ -59,7 +69,8 @@ export const Message = ({
                 return (
                   <div key={toolCallId} className="skeleton">
                     {toolName === "getWeather" ? <Weather /> : 
-                     toolName === "getWebpageMarkdown" ? <WebpageMarkdownViewer /> : null}
+                     toolName === "getWebpageMarkdown" ? <WebpageMarkdownViewer /> : 
+                     toolName === "searchGoogle" ? <SearchGoogleResults query="" results={[]} /> : null}
                   </div>
                 );
               }
