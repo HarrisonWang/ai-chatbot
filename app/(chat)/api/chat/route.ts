@@ -4,6 +4,7 @@ import { z } from "zod";
 import { customModel } from "@/ai";
 import { auth } from "@/app/(auth)/auth";
 import { deleteChatById, getChatById, saveChat } from "@/db/queries";
+import { loadAllFunctions } from "@/lib/functionLoader";
 
 export async function POST(request: Request) {
   const { id, messages }: { id: string; messages: Array<Message> } =
@@ -15,6 +16,9 @@ export async function POST(request: Request) {
     return new Response("Unauthorized", { status: 401 });
   }
 
+  // 动态加载所有函数
+  const availableFunctions = await loadAllFunctions();
+
   const coreMessages = convertToCoreMessages(messages);
 
   const result = await streamText({
@@ -23,34 +27,7 @@ export async function POST(request: Request) {
       "you are a friendly assistant! keep your responses concise and helpful.",
     messages: coreMessages,
     maxSteps: 5,
-    tools: {
-      getWeather: {
-        description: "Get the current weather at a location",
-        parameters: z.object({
-          latitude: z.number(),
-          longitude: z.number(),
-        }),
-        execute: async ({ latitude, longitude }) => {
-          const response = await fetch(
-            `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m&hourly=temperature_2m&daily=sunrise,sunset&timezone=auto`,
-          );
-
-          const weatherData = await response.json();
-          return weatherData;
-        },
-      },
-      getWebpageMarkdown: {
-        description: "Get the markdown content of a webpage",
-        parameters: z.object({
-          url: z.string().url(),
-        }),
-        execute: async ({ url }) => {
-          const response = await fetch(`http://r.jina.ai/${url}`);
-          const markdown = await response.text();
-          return markdown;
-        },
-      },
-    },
+    tools: availableFunctions,
     onFinish: async ({ responseMessages }) => {
       if (session.user && session.user.id) {
         try {
@@ -60,7 +37,7 @@ export async function POST(request: Request) {
             userId: session.user.id,
           });
         } catch (error) {
-          console.error("Failed to save chat");
+          console.error("Failed to save chat:", error);
         }
       }
     },
