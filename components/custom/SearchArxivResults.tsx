@@ -4,20 +4,20 @@ import cx from "classnames";
 import { ChevronDown } from 'lucide-react';
 import { useState } from "react";
 
-interface SearchGoogleResult {
+interface ArxivResult {
+  id: string;
   title: string;
-  url: string;
-  snippet: string;
+  summary: string;
 }
 
-interface SearchGoogleResultsProps {
+interface SearchArxivResultsProps {
   query: string;
-  results: SearchGoogleResult[];
+  totalResults: number | 0;
+  arxivEntries?: ArxivResult[] | null;
 }
 
-export function SearchGoogleResults({ query, results }: SearchGoogleResultsProps) {
+export function SearchArxivResults({ query, totalResults, arxivEntries }: SearchArxivResultsProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
       <div 
@@ -25,7 +25,7 @@ export function SearchGoogleResults({ query, results }: SearchGoogleResultsProps
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-          已搜索 {results.length} 个网站
+          已搜索 {totalResults} 篇arXiv论文
         </h3>
         <ChevronDown className={cx(
           "h-4 w-4 text-gray-500 dark:text-gray-400 transition-transform duration-300",
@@ -42,14 +42,23 @@ export function SearchGoogleResults({ query, results }: SearchGoogleResultsProps
           <div className="mb-2 text-sm text-gray-600 dark:text-gray-400 break-words">
             &quot;{query}&quot;
           </div>
-          {results.map((result, index) => (
-            <div key={index} className="mb-3">
-              <a href={result.url} className="text-blue-600 hover:underline text-sm break-words" target="_blank" rel="noopener noreferrer">
-                {result.title}
-              </a>
-              <p className="text-sm text-gray-700 dark:text-gray-300 mt-1 break-words">{result.snippet}</p>
+          {!arxivEntries ? (
+            <div className="flex justify-center items-center p-4">
+              <div className="animate-spin rounded-full size-8 border-y-2 border-gray-900 dark:border-gray-100"></div>
+              <span className="ml-2 text-gray-700 dark:text-gray-300">正在加载...</span>
             </div>
-          ))}
+          ) : arxivEntries.length > 0 ? (
+            arxivEntries.map((result, index) => (
+              <div key={index} className="mb-3">
+                <a href={`${result.id}`} className="text-blue-600 hover:underline text-sm font-medium break-words" target="_blank" rel="noopener noreferrer">
+                  {result.title}
+                </a>
+                <p className="text-sm text-gray-700 dark:text-gray-300 mt-1 break-words">{result.summary}</p>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-700 dark:text-gray-300">没有找到结果。</p>
+          )}
         </div>
       </div>
     </div>

@@ -6,7 +6,8 @@ async function fetchWithRetry(url: string, retries = 0): Promise<any> {
   try {
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    return await response.json();
+    const data = await response.json();
+    return data;
   } catch (error) {
     if (retries < MAX_RETRIES) {
       console.warn(`Retry attempt ${retries + 1} for ${url}`);
@@ -30,12 +31,12 @@ export const searchGoogle = {
     const serpApiUrl = `https://serpapi.com/search?api_key=${serpApiKey}&q=${encodeURIComponent(query)}`;
 
     try {
-      return await fetchWithRetry(googleUrl);
-    } catch (googleError) {
-      console.error("Google API 调用失败，尝试使用 SerpAPI");
+      return await fetchWithRetry(serpApiUrl);
+    } catch (serpApiError) {
+      console.error("SerpAPI 调用失败，尝试使用 Google API");
       try {
-        return await fetchWithRetry(serpApiUrl);
-      } catch (serpApiError) {
+        return await fetchWithRetry(googleUrl);
+      } catch (googleApiError) {
         throw new Error("两个搜索 API 都失败了");
       }
     }

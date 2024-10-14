@@ -35,6 +35,16 @@ const suggestedActions = [
     title: "文章摘要",
     label: "https://xiaowangye.org/posts/how-to-build-google-custom-search-engine-step-by-step",
     action: "Using the webpage https://xiaowangye.org/posts/how-to-build-google-custom-search-engine-step-by-step provided by the user, write a summary in the same language, highlighting the key points. Include a hook to attract clicks, starting with a question to engage the user.",
+  },
+  {
+    title: "谷歌搜索",
+    label: "搜索 Google CSE API 的使用",
+    action: "Google 搜索 Google CSE API 的使用？",
+  }, 
+  {
+    title: "论文搜索",
+    label: "RAG 系统实现",
+    action: "搜索下 RAG 系统实现论文，使用中文总结下",
   }, 
 ];
 

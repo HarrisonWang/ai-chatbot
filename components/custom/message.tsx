@@ -7,6 +7,7 @@ import { ReactNode } from "react";
 import { BotIcon, UserIcon } from "./icons";
 import { Markdown } from "./markdown";
 import { PreviewAttachment } from "./preview-attachment";
+import { SearchArxivResults } from "./SearchArxivResults";
 import { SearchGoogleResults } from "./SearchGoogleResults";
 import { Weather } from "./weather";
 import { WebpageMarkdownViewer } from "./WebpageMarkdownViewer";
@@ -53,7 +54,7 @@ export const Message = ({
                       <Weather weatherAtLocation={result} />
                     ) : toolName === "getWebpageMarkdown" ? (
                       <WebpageMarkdownViewer data={result} />
-                    ) : toolName === "search" ? (
+                    ) : toolName === "searchGoogle" ? (
                       <SearchGoogleResults 
                         query={result.query} 
                         results={result.organic_results?.map((item: any) => ({
@@ -61,6 +62,12 @@ export const Message = ({
                           url: item.link,
                           snippet: item.snippet
                         })) || []}
+                      />
+                    ) : toolName === "searchArxiv" ? (
+                      <SearchArxivResults
+                        query={result.query}
+                        totalResults={result.totalResults}
+                        arxivEntries={result.arxivEntries}
                       />
                     ) : null}
                   </div>
@@ -70,7 +77,8 @@ export const Message = ({
                   <div key={toolCallId} className="skeleton">
                     {toolName === "getWeather" ? <Weather /> : 
                      toolName === "getWebpageMarkdown" ? <WebpageMarkdownViewer /> : 
-                     toolName === "searchGoogle" ? <SearchGoogleResults query="" results={[]} /> : null}
+                     toolName === "searchGoogle" ? <SearchGoogleResults query="" results={[]} /> :
+                     toolName === "searchArxiv" ? <SearchArxivResults query="" totalResults={0} arxivEntries={null} /> : null}
                   </div>
                 );
               }
